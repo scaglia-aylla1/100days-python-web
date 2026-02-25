@@ -51,7 +51,7 @@
     100days-python-web/
     │
     ├── todolist-api/
-    ├── django-blog/
+    ├── finance-control-django/
     ├── fastapi-fullstack/
     ├── docs/
     └── README.md
@@ -104,13 +104,17 @@
 
 * Documentação profissional
 
-### 🔹 Projeto Intermediário 2 — Django Blog
+### 🔹 Projeto Intermediário 2 — Finance Control-(django)
 
 * Sistema de autenticação
 
-* CRUD de posts
+* CRUD de receitas e despesas
 
-* Templates
+* Categorias financeiras
+
+* Dashboard com saldo e métricas
+
+* Filtros por período
 
 * Deploy em produção
 
