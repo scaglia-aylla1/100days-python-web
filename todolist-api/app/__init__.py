@@ -14,6 +14,7 @@ def create_app():
 
     db.init_app(app)
 
+    from .models import Task
     from .routes import main
     app.register_blueprint(main)
 
