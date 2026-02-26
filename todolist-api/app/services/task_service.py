@@ -18,3 +18,30 @@ class TaskService:
     @staticmethod
     def list_tasks():
         return Task.query.all()
+    
+    @staticmethod
+    def get_task_by_id(task_id: int):
+        task = Task.query.get(task_id)
+
+        if not task:
+            raise ValueError("Task not found")
+
+        return task
+    
+    @staticmethod
+    def update_task(task_id: int, data: dict):
+        task = Task.query.get(task_id)
+
+        if not task:
+            raise ValueError("Task not found")
+
+        if "title" in data:
+            task.title = data["title"]
+
+        if "completed" in data:
+            task.completed = data["completed"]
+
+        db.session.commit()
+
+        return task
+
