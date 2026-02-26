@@ -45,3 +45,12 @@ class TaskService:
 
         return task
 
+    @staticmethod
+    def delete_task(task_id: int):
+        task = Task.query.get(task_id)
+
+        if not task:
+            raise ValueError("Task not found")
+
+        db.session.delete(task)
+        db.session.commit()

@@ -67,3 +67,12 @@ def update_task(task_id):
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 404
+
+@main.route("/tasks/<int:task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    try:
+        TaskService.delete_task(task_id)
+        return jsonify({"message": "Task deleted successfully"}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
