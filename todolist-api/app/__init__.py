@@ -1,13 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
-import os
-from flask_migrate import Migrate
 from config import Config
+from .extensions import db, migrate, api
 
-
-db = SQLAlchemy()
-migrate = Migrate()
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -19,8 +13,9 @@ def create_app(test_config=None):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    api.init_app(app)
 
-    from .routes import main
-    app.register_blueprint(main)
+    from .routes import blp
+    api.register_blueprint(blp)
 
     return app

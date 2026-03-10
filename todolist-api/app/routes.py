@@ -1,78 +1,51 @@
-from flask import Blueprint, jsonify, request
+from flask.views import MethodView
+from flask_smorest import Blueprint
+
 from .services.task_service import TaskService
+from .schemas.task_schema import TaskSchema, TaskCreateSchema, TaskCompleteSchema
 
-main = Blueprint("main", __name__)
-
-@main.route("/tasks", methods=["POST"])
-def create_task():
-    data = request.get_json()
-
-    try:
-        task = TaskService.create_task(data.get("title"))
-
-        return jsonify({
-            "id": task.id,
-            "title": task.title,
-            "completed": task.completed,
-            "created_at": task.created_at
-        }), 201
-
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+blp = Blueprint(
+    "tasks",
+    __name__,
+    url_prefix="/tasks",
+    description="Operations on tasks"
+)
 
 
-@main.route("/tasks", methods=["GET"])
-def list_tasks():
-    tasks = TaskService.list_tasks()
+@blp.route("/")
+class TaskList(MethodView):
 
-    result = []
-    for task in tasks:
-        result.append({
-            "id": task.id,
-            "title": task.title,
-            "completed": task.completed,
-            "created_at": task.created_at
-        })
+    @blp.response(200, TaskSchema(many=True))
+    def get(self):
+        """List all tasks"""
+        return TaskService.list_tasks()
 
-    return jsonify(result), 200
+    @blp.arguments(TaskCreateSchema)
+    @blp.response(201, TaskSchema)
+    def post(self, data):
+        """Create a new task"""
+        return TaskService.create_task(data["title"])
 
-@main.route("/tasks/<int:task_id>", methods=["GET"])
-def get_task(task_id):
-    try:
-        task = TaskService.get_task_by_id(task_id)
 
-        return jsonify({
-            "id": task.id,
-            "title": task.title,
-            "completed": task.completed,
-            "created_at": task.created_at
-        }), 200
+@blp.route("/<int:task_id>")
+class TaskDetail(MethodView):
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
-
-@main.route("/tasks/<int:task_id>", methods=["PUT"])
-def update_task(task_id):
-    try:
-        data = request.get_json()
-
-        task = TaskService.update_task(task_id, data)
-
-        return jsonify({
-            "id": task.id,
-            "title": task.title,
-            "completed": task.completed,
-            "created_at": task.created_at
-        }), 200
-
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
-
-@main.route("/tasks/<int:task_id>", methods=["DELETE"])
-def delete_task(task_id):
-    try:
+    def delete(self, task_id):
+        """Delete a task"""
         TaskService.delete_task(task_id)
-        return jsonify({"message": "Task deleted successfully"}), 200
+        return {"message": "Task deleted"}, 204
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+    @blp.arguments(TaskCompleteSchema)
+    @blp.response(200, TaskSchema)
+    def patch(self, data, task_id):
+        """Mark a task as completed"""
+
+        if data["completed"] is not True:
+            return {"message": "Only completed=True is allowed"}, 400
+
+        task = TaskService.complete_task(task_id)
+
+        if not task:
+            return {"message": "Task not found"}, 404
+
+        return task
