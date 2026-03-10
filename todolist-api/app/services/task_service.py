@@ -32,3 +32,13 @@ class TaskService:
         db.session.commit()
 
         return task
+    
+    @staticmethod
+    def list_tasks(completed=None):
+
+        query = Task.query
+
+        if completed is not None:
+            query = query.filter_by(completed=completed)
+
+        return query.all()

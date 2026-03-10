@@ -3,6 +3,8 @@ from flask_smorest import Blueprint
 
 from .services.task_service import TaskService
 from .schemas.task_schema import TaskSchema, TaskCreateSchema, TaskCompleteSchema
+from flask import request
+
 
 blp = Blueprint(
     "tasks",
@@ -17,8 +19,14 @@ class TaskList(MethodView):
 
     @blp.response(200, TaskSchema(many=True))
     def get(self):
-        """List all tasks"""
-        return TaskService.list_tasks()
+        """List tasks with optional completed filter"""
+
+        completed = request.args.get("completed")
+
+        if completed is not None:
+            completed = completed.lower() == "true"
+
+        return TaskService.list_tasks(completed)
 
     @blp.arguments(TaskCreateSchema)
     @blp.response(201, TaskSchema)
@@ -49,3 +57,9 @@ class TaskDetail(MethodView):
             return {"message": "Task not found"}, 404
 
         return task
+@blp.route("/health")
+class HealthCheck(MethodView):
+
+    def get(self):
+        """API health check"""
+        return {"status": "ok"}
