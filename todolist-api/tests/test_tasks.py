@@ -17,7 +17,7 @@ def client():
             db.drop_all()
 
 def test_create_task(client):
-    response = client.post("/tasks", json={
+    response = client.post("/tasks/", json={
         "title": "Test Task"
     })
 
@@ -29,10 +29,10 @@ def test_create_task(client):
 
 def test_get_tasks(client):
     # cria task
-    client.post("/tasks", json={"title": "Task 1"})
-    client.post("/tasks", json={"title": "Task 2"})
+    client.post("/tasks/", json={"title": "Task 1"})
+    client.post("/tasks/", json={"title": "Task 2"})
 
-    response = client.get("/tasks")
+    response = client.get("/tasks/")
 
     assert response.status_code == 200
     data = response.get_json()
@@ -41,7 +41,7 @@ def test_get_tasks(client):
 
 def test_get_task_by_id(client):
     # cria task
-    response = client.post("/tasks", json={"title": "Task única"})
+    response = client.post("/tasks/", json={"title": "Task única"})
     task_id = response.get_json()["id"]
 
     # busca por id
@@ -55,7 +55,7 @@ def test_get_task_by_id(client):
 
 def test_update_task(client):
     # cria task
-    response = client.post("/tasks", json={"title": "Antigo"})
+    response = client.post("/tasks/", json={"title": "Antigo"})
     task_id = response.get_json()["id"]
 
     # atualiza
@@ -72,7 +72,7 @@ def test_update_task(client):
 
 def test_delete_task(client):
     # cria task
-    response = client.post("/tasks", json={"title": "Para deletar"})
+    response = client.post("/tasks/", json={"title": "Para deletar"})
     task_id = response.get_json()["id"]
 
     # deleta
